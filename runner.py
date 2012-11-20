@@ -1,5 +1,6 @@
 import sys, ConfigParser
 from copybuild import *
+from cleanfolder import *
 
 def get_config():
     try:
@@ -18,6 +19,16 @@ if __name__ == '__main__':
         #Get path of build in SPB builder and path of build on local
         build_source_path = config_reader.get('build', 'srcpath') % sys.argv[1]
         build_destination_path = config_reader.get('build', 'dstpath') % sys.argv[1]
+
+        #Get path of pool
+        pending_path = config_reader.get('pools','pendings')
+        lab_status = config_reader.get('pools','labstatus')
+        test_results = config_reader.get('pools','testresult') % sys.argv[1]
+        
+        #Clean pool folders
+        clean_folder(pending_path)
+        clean_folder(lab_status)
+        clean_folder(test_results)
 
         #Get file name of latest IPAgent
         latest_agent = get_latest_ipagent(build_source_path)
