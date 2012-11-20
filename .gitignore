@@ -1,0 +1,9 @@
+*Thumbs.db
+*.pyc
+*.bak
+.project
+.pydevproject
+.ropeproject
+*.orig
+*.log
+.idea
