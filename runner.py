@@ -12,6 +12,7 @@ def get_config():
 
 
 
+
 if __name__ == '__main__':
     try:
         config_reader = get_config()
@@ -24,7 +25,7 @@ if __name__ == '__main__':
         pending_path = config_reader.get('pools','pendings')
         lab_status = config_reader.get('pools','labstatus')
         test_results = config_reader.get('pools','testresult') % sys.argv[1]
-        
+
         #Clean pool folders
         clean_folder(pending_path)
         clean_folder(lab_status)
@@ -38,6 +39,13 @@ if __name__ == '__main__':
 
         #Unzip IPAgent
         unzip_ipagent(build_destination_path, latest_agent)
+
+        #Copy files to pending folder
+        licence_source_path = config_reader.get('prepration','licence') % sys.argv[1]
+        cmdlets_source_path = config_reader.get('prepration','cmdlets') % sys.argv[1]
+
+        copy_files_to_pending(build_destination_path, cmdlets_source_path, licence_source_path, pending_path)
+
     except Exception, ex:
         print str(ex)
 
