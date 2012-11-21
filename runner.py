@@ -1,5 +1,6 @@
 import sys, ConfigParser
 from copybuild import *
+from cleanfolder import *
 
 def get_config():
     try:
@@ -11,6 +12,7 @@ def get_config():
 
 
 
+
 if __name__ == '__main__':
     try:
         config_reader = get_config()
@@ -18,6 +20,16 @@ if __name__ == '__main__':
         #Get path of build in SPB builder and path of build on local
         build_source_path = config_reader.get('build', 'srcpath') % sys.argv[1]
         build_destination_path = config_reader.get('build', 'dstpath') % sys.argv[1]
+
+        #Get path of pool
+        pending_path = config_reader.get('pools','pendings')
+        lab_status = config_reader.get('pools','labstatus')
+        test_results = config_reader.get('pools','testresult') % sys.argv[1]
+
+        #Clean pool folders
+        clean_folder(pending_path)
+        clean_folder(lab_status)
+        clean_folder(test_results)
 
         #Get file name of latest IPAgent
         latest_agent = get_latest_ipagent(build_source_path)
@@ -27,6 +39,13 @@ if __name__ == '__main__':
 
         #Unzip IPAgent
         unzip_ipagent(build_destination_path, latest_agent)
+
+        #Copy files to pending folder
+        licence_source_path = config_reader.get('prepration','licence') % sys.argv[1]
+        cmdlets_source_path = config_reader.get('prepration','cmdlets') % sys.argv[1]
+
+        copy_files_to_pending(build_destination_path, cmdlets_source_path, licence_source_path, pending_path)
+
     except Exception, ex:
         print str(ex)
 
