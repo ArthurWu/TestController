@@ -42,3 +42,6 @@ def copy_files_to_pending(build_destination_path, cmdlets_source_path, licence_s
     shutil.copytree(ipagent_source_path, ipagent_destination_path)
     shutil.copytree(cmdlets_source_path, cmdlets_destination_path)
 
+def copy_fitnesse_root(src, dest):
+    shutil.copytree(src, dest)
+

@@ -10,9 +10,6 @@ def get_config():
     except:
         raise Exception('Please check the config.ini exists, or its content is correct or not.')
 
-
-
-
 if __name__ == '__main__':
     try:
         config_reader = get_config()
@@ -24,7 +21,8 @@ if __name__ == '__main__':
         #Get path of pool
         pending_path = config_reader.get('pools','pendings')
         lab_status = config_reader.get('pools','labstatus')
-        test_results = config_reader.get('pools','testresult') % sys.argv[1]
+        test_results = config_reader.get('pools','testresult')
+
 
         #Clean pool folders
         clean_folder(pending_path)
@@ -45,6 +43,12 @@ if __name__ == '__main__':
         cmdlets_source_path = config_reader.get('prepration','cmdlets') % sys.argv[1]
 
         copy_files_to_pending(build_destination_path, cmdlets_source_path, licence_source_path, pending_path)
+
+        #prepare fitnesse root folder
+        fitnesseroot = config_reader.get('prepration','fitnesseroot') % sys.argv[1]
+        workingfitroot = config_reader.get('prepration','workingfitroot')
+
+        update_fitnesse_root(fitnesseroot, workingfitroot)
 
     except Exception, ex:
         print str(ex)
