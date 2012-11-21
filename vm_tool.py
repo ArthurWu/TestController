@@ -38,5 +38,14 @@ class Host:
         self.pwd = info['pwd']
         self.vms = info['vms']
 
+# this method is used to get all the vms path for tester the set config.ini labs section
+def get_vms_path(host):
+    vi = VIServer()
+    vi.connect(host, 'root', 'Pa$$word')
+    all_vms_path = vi.get_registered_vms()
+    print all_vms_path
+    vi.disconnect()
+
 if __name__ == '__main__':
-    revert_and_start()
+    print 'revert...'
+    #revert_and_start()
