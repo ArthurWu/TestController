@@ -1,25 +1,19 @@
 from urllib import urlopen
 import os
+from runner import get_config
 try:
 	import json
 except:
 	import simplejson as json
 
-TEST_ROOT = 'http://arthur10:8080/'
 PARAMS_PROPERTIES = '?properties&format=json'
 PARAMS_NAME = '?names&format=json&ShowChildCount'
-RESULT_DIR = 'C:\\AT4Forks\\FitNesse\\FitNesseRoot\\files\\testResults\\'
+DEFAULT_ROOT = get_config().get('fitnesse', 'rooturl')
 
-def get_properties(url):
-	return json.loads(urlopen(url+PARAMS_PROPERTIES).read())
-
-def get_subtest_urls(url):
-	# result formart: ["PageFooter 0","ErrorLogs 2","FitNesse 9"]
-	result = json.loads(urlopen(url+PARAMS_NAME).read())
-	url = url == TEST_ROOT and url or url + '.'
-	return [url + r.split(" ")[0] for r in result]
-
-def get_tests(root):
+def get_tests(root=DEFAULT_ROOT):
+	''' 
+	root is a fitnesse url, this function returns all tests under this url
+	'''
 	properties = get_properties(root)
 	is_normal = not properties['Suite'] and not properties['Test']
 	is_suite = properties['Suite'] and not properties['Test']
@@ -33,30 +27,39 @@ def get_tests(root):
 		urls = get_subtest_urls(test_url)
 		subtests = map(get_tests, urls)
 		for tests in subtests:
-			if isinstance(tests, list):
-				test_list += tests
+			if isinstance(tests, list): 
+				test_list.extend(tests)
 	else:
 		return
 
 	return test_list
 
-def check_results(path, tests = None):
-	if not tests:
-		tests = get_tests(TEST_ROOT)
+def check_results(test_root = DEFAULT_ROOT, tests = None):
+	result_dir = get_config().get('pools', 'testresult')
+	tests = get_tests(test_root) if not tests else tests
 
 	results = []
 	for test in tests:
-		result_folder = RESULT_DIR + test.replace(TEST_ROOT, '')
+		result_folder = result_dir.rstrip('\\') + '\\' + test.split('/')[-1]
 
 		for root, dirs, files in os.walk(result_folder):
 			files.sort()
-			#20120202171855_424_0_26_0.xml
+			#result file name formart: 20120202171855_424_0_26_0.xml
 			latest_result = files and files[0].split('.')[0].split('_')
 			result = convert_result([int(i) for i in latest_result])
 			result.setdefault('url', test)
 			results.append(result)
 	
 	return sort_by_status(results)
+
+def get_properties(url):
+	return json.loads(urlopen(url+PARAMS_PROPERTIES).read())
+
+def get_subtest_urls(url):
+	# call api result formart: ["PageFooter 0","ErrorLogs 2","FitNesse 9"]
+	result = json.loads(urlopen(url+PARAMS_NAME).read())
+	url = url.endswith('/') and url or url + '.'
+	return [url + r.split(" ")[0] for r in result]
 
 def convert_result(result):
 	date, right, wrong, igone, exception = result

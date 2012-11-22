@@ -12,7 +12,7 @@ def revert_and_start():
             
             for vm_path in host.vms:
                 try:
-                    vm = server.get_vm_by_path(vm_path.strip())                    
+                    vm = server.get_vm_by_path(vm_path.strip())
                     vm.revert_to_snapshot()
                     if not vm.is_powered_on():
                         vm.power_on()
