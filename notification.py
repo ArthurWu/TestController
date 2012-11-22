@@ -11,7 +11,7 @@ cc = ['175040128@qq.com']
 body = '''
 Dear all,
 
-	All tests are passed.
+	Warrior and blade's tests are ok.
 
 '''
 
