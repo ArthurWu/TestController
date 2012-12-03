@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test Result</title>
+<link rel="stylesheet" type="text/css" href="./static/bootstrap/css/bootstrap.min.css" media="screen">
+<link rel="stylesheet" type="text/css" href="./static/css/style.css" media="screen">
+</head>
+<body>
+<div class="container">
+	<div class="navbar">
+		<ul class="nav nav-pills">
+		  <li class="active">
+		    <a href="#">Test Results</a>
+		  </li>
+		  <li><a href="#">Jenkins</a></li>
+		  <li><a href="#">Fitnesse</a></li>
+		  <li><a href="#">Test Enviorenments</a></li>
+		  <li class="dropdown">
+		  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">Tools<b class="caret"></b></a>
+		    <ul class="dropdown-menu">
+		      <li><a href="#">Call API</a></li>
+		    </ul>
+		  </li>
+		</ul>
+		<div class="clearfix"></div>
+	</div>
+	<hr>
+	<div class="row">
+		<span id="id_teams" class="span">
+			<a id="id_team_warrior" href="" class="btn">Warrior</a>
+			<a id="id_team_wizard" href="" class="btn">Wizard</a>
+			<a id="id_team_hunter" href="" class="btn">Hunter</a>
+			<a id="id_team_caissa" href="" class="btn">Caissa</a>
+		</span>
+		<div id="id_alert" class="alert span hide">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+  			<strong id="id_title">Warning!</strong> <span id="id_msg">You have not selected any Team yet!</span>
+		</div>
+	</div>
+	<div class="row show-grid">
+		<div class="span">
+			<em class="muted actual-on">Actual on: <em id="id_actual_on">none</em></em>
+			<a id="id_reflash" href="">Reflash</a>
+			<span id="id_loading" class="hide"><em>Reflashing</em>&nbsp;&nbsp;<img src="./static/images/loading.gif" /></span>
+		</div>
+		<div class="span6 right">
+			<span class="label label-info">Total:<span id="id_total"></span></span>
+			<span class="label label-important">Red:<span id="id_red"></span></span>
+			<span class="label">Gray:<span id="id_gray"></span></span>
+			<span class="label label-success">Green:<span id="id_green"></span></span>
+		</div>
+	</div>
+	<div class="content">
+		<hr>
+		<ul id="id_results" class="unstyled">
+		</ul>
+	</div>
+	<div class="footer"></div>
+</div>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+<script src="./static/bootstrap/js/bootstrap.min.js"></script>
+<script src="./static/js/test.js"></script>
+</body>
+</html>

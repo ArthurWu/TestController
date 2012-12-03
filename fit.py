@@ -1,13 +1,12 @@
-from urllib import urlopen
+from urllib2 import urlopen
 import os
 from runner import get_config
+import const
 try:
 	import json
 except:
 	import simplejson as json
 
-PARAMS_PROPERTIES = '?properties&format=json'
-PARAMS_NAME = '?names&format=json&ShowChildCount'
 DEFAULT_ROOT = get_config().get('fitnesse', 'rooturl')
 
 def get_tests(root=DEFAULT_ROOT):
@@ -34,8 +33,8 @@ def get_tests(root=DEFAULT_ROOT):
 
 	return test_list
 
-def check_results(test_root = DEFAULT_ROOT, tests = None):
-	result_dir = get_config().get('pools', 'testresult')
+def check_results(test_root = DEFAULT_ROOT, team=const.WARRIOR, tests = None):
+	result_dir = get_config().get('pools', 'testresult') % team
 	tests = get_tests(test_root) if not tests else tests
 
 	results = []
@@ -45,19 +44,22 @@ def check_results(test_root = DEFAULT_ROOT, tests = None):
 		for root, dirs, files in os.walk(result_folder):
 			files.sort()
 			#result file name formart: 20120202171855_424_0_26_0.xml
-			latest_result = files and files[0].split('.')[0].split('_')
-			result = convert_result([int(i) for i in latest_result])
+			latest_result = files and files[-1].split('.')[0].split('_')
+			result, date = convert_result([int(i) for i in latest_result])
 			result.setdefault('url', test)
+			result.setdefault('latest_hostory', const.FIT_HISTORY % (test, date))
 			results.append(result)
 	
 	return sort_by_status(results)
 
 def get_properties(url):
-	return json.loads(urlopen(url+PARAMS_PROPERTIES).read())
+	print const.FIT_PROPERTIES % url
+	return json.loads(urlopen(const.FIT_PROPERTIES % url).read())
 
 def get_subtest_urls(url):
 	# call api result formart: ["PageFooter 0","ErrorLogs 2","FitNesse 9"]
-	result = json.loads(urlopen(url+PARAMS_NAME).read())
+	print const.FIT_NAME % url
+	result = json.loads(urlopen(const.FIT_NAME % url).read())
 	url = url.endswith('/') and url or url + '.'
 	return [url + r.split(" ")[0] for r in result]
 
@@ -72,7 +74,7 @@ def convert_result(result):
 	else:
 		green = True
 
-	return {'red': red, 'gray': gray, 'green': green}
+	return {'red': red, 'gray': gray, 'green': green}, date
 
 def sort_by_status(results):
 	reds = []
@@ -86,3 +88,7 @@ def sort_by_status(results):
 	grays.sort()
 	greens.sort()
 	return reds+grays+greens
+
+if __name__ == '__main__':
+	print DEFAULT_ROOT
+	print check_results()
