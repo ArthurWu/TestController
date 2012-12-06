@@ -3,12 +3,12 @@ $(function(){
 
 	$('#id_reflash').click(function(e){
 		e.preventDefault();
-		var selected_team = $('#id_teams a.btn-primary');
+		var  selected_team = $('#id_teams a.btn-primary');
 		if (selected_team === null || selected_team.length == 0){
 			showAlert("", 'Warring!', 'You have not selected any Team yet!');
 			return;
 		}
-		updateTestResults();
+		updateTestResults(selected_team[0].text);
 	});
 
 	$('#id_team_warrior').click(function(e){changeTeam(e, this);});
@@ -16,23 +16,14 @@ $(function(){
 	$('#id_team_hunter').click(function(e){changeTeam(e, this);});
 	$('#id_team_caissa').click(function(e){changeTeam(e, this);});
 
-	$('#id_total').click(function(){$('ul.unstyled li').show();});
-	$('#id_red').click(function(){filterResult('error');});
-	$('#id_gray').click(function(){filterResult('warring');});
-	$('#id_green').click(function(){filterResult('success');});
+	$('#id_total').parent().click(function(){$('ul.unstyled li').show();});
+	$('#id_red').parent().click(function(){filterResult('error');});
+	$('#id_gray').parent().click(function(){filterResult('warring');});
+	$('#id_green').parent().click(function(){filterResult('success');});
 
 	function filterResult(flag){
-		$('ul.unstyled li').each(function(){
-			var self = $(this);
-			if (self.hasClass(flag))
-			{
-				self.show();
-			}
-			else
-			{
-				self.hide();
-			}
-		});
+		$('ul.unstyled li').hide();
+		$('ul.unstyled li.'+flag).show();
 	}
 });
 
@@ -48,7 +39,7 @@ function showAlert (type, title, msg) {
 
 function changeTeam(event, btn){
 	event.preventDefault();
-	loadTestResults('reflash=true&team='+$(btn).text()); 
+	loadTestResults('reflash=false&team='+$(btn).text()); 
 	selectedTeam(btn);
 }
 

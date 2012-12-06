@@ -9,6 +9,8 @@
 }
 .page-header{
 	text-align: center;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
 }
 span.label:hover{
 	cursor: pointer;
@@ -28,7 +30,7 @@ hr{margin:0;}
 	background-color: #BDECA9;
 }
 .warring{
-	background-color: #DADADA;
+	background-color: #C7C7C7;
 }
 .error{
 	background-color: #F0B8B8;	

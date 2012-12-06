@@ -37,28 +37,37 @@ def check_results(test_root = DEFAULT_ROOT, team=const.WARRIOR, tests = None):
 	result_dir = get_config().get('pools', 'testresult') % team
 	tests = get_tests(test_root) if not tests else tests
 
+	print 'len: %d' % len(tests)
+	print tests[:20]
+
 	results = []
 	for test in tests:
 		result_folder = result_dir.rstrip('\\') + '\\' + test.split('/')[-1]
 
-		for root, dirs, files in os.walk(result_folder):
-			files.sort()
-			#result file name formart: 20120202171855_424_0_26_0.xml
-			latest_result = files and files[-1].split('.')[0].split('_')
-			result, date = convert_result([int(i) for i in latest_result])
-			result.setdefault('url', test)
-			result.setdefault('latest_hostory', const.FIT_HISTORY % (test, date))
-			results.append(result)
+		if os.path.exists(result_folder):
+			for root, dirs, files in os.walk(result_folder):
+				files.sort()
+				#result file name formart: 20120202171855_424_0_26_0.xml
+				latest_result = files and files[-1].split('.')[0].split('_')
+				result, date = convert_result([int(i) for i in latest_result])
+				result.setdefault('url', test)
+				result.setdefault('latest_hostory', const.FIT_HISTORY % (test, date))
+				results.append(result)
+		else:
+			igone_res = {'red': False, 'gray': True, 'green': False}
+			igone_res.setdefault('url', test)
+			igone_res.setdefault('latest_hostory', test)
+			results.append(igone_res)
 	
 	return sort_by_status(results)
 
 def get_properties(url):
-	print const.FIT_PROPERTIES % url
+	#print const.FIT_PROPERTIES % url
 	return json.loads(urlopen(const.FIT_PROPERTIES % url).read())
 
 def get_subtest_urls(url):
 	# call api result formart: ["PageFooter 0","ErrorLogs 2","FitNesse 9"]
-	print const.FIT_NAME % url
+	#print const.FIT_NAME % url
 	result = json.loads(urlopen(const.FIT_NAME % url).read())
 	url = url.endswith('/') and url or url + '.'
 	return [url + r.split(" ")[0] for r in result]
