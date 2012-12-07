@@ -7,38 +7,40 @@ try:
 except:
 	import simplejson as json
 
-DEFAULT_ROOT = get_config().get('fitnesse', 'rooturl')
+updated_value = lambda n: get_config().get('fitnesse', n)
+DEFAULT_ROOT = updated_value('rooturl')
 
 def get_tests(root=DEFAULT_ROOT):
 	''' 
 	root is a fitnesse url, this function returns all tests under this url
 	'''
+	skiptests = updated_value('skiptests').split(',')
+	relative_path = root.split('/')[-1]
+	if relative_path in skiptests: 
+		return []
+
 	properties = get_properties(root)
 	is_normal = not properties['Suite'] and not properties['Test']
 	is_suite = properties['Suite'] and not properties['Test']
 	is_test = not properties['Suite'] and properties['Test']
+	
 
 	test_url = root
 	test_list = []
 	if is_test:
 		test_list.append(test_url)
-	elif is_normal or is_suite:
+	else: # is_normal or is_suite:
 		urls = get_subtest_urls(test_url)
 		subtests = map(get_tests, urls)
 		for tests in subtests:
 			if isinstance(tests, list): 
 				test_list.extend(tests)
-	else:
-		return
 
 	return test_list
 
 def check_results(test_root = DEFAULT_ROOT, team=const.WARRIOR, tests = None):
 	result_dir = get_config().get('pools', 'testresult') % team
 	tests = get_tests(test_root) if not tests else tests
-
-	print 'len: %d' % len(tests)
-	print tests[:20]
 
 	results = []
 	for test in tests:
@@ -47,7 +49,7 @@ def check_results(test_root = DEFAULT_ROOT, team=const.WARRIOR, tests = None):
 		if os.path.exists(result_folder):
 			for root, dirs, files in os.walk(result_folder):
 				files.sort()
-				#result file name formart: 20120202171855_424_0_26_0.xml
+				# result file name formart: 20120202171855_424_0_26_0.xml
 				latest_result = files and files[-1].split('.')[0].split('_')
 				result, date = convert_result([int(i) for i in latest_result])
 				result.setdefault('url', test)
@@ -62,12 +64,10 @@ def check_results(test_root = DEFAULT_ROOT, team=const.WARRIOR, tests = None):
 	return sort_by_status(results)
 
 def get_properties(url):
-	#print const.FIT_PROPERTIES % url
 	return json.loads(urlopen(const.FIT_PROPERTIES % url).read())
 
 def get_subtest_urls(url):
 	# call api result formart: ["PageFooter 0","ErrorLogs 2","FitNesse 9"]
-	#print const.FIT_NAME % url
 	result = json.loads(urlopen(const.FIT_NAME % url).read())
 	url = url.endswith('/') and url or url + '.'
 	return [url + r.split(" ")[0] for r in result]

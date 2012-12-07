@@ -1,5 +1,8 @@
 import web, os, sys
-import json
+try:
+	import json
+except:
+	import simplejson as json
 import ConfigParser
 import utils
 
